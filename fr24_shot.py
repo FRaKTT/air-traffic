@@ -2,6 +2,7 @@ from selenium import webdriver
 import time
 from datetime import datetime
 import sys
+import os
 
 FR24_URL = 'https://www.flightradar24.com/'
 AREAS = {'eurasia'  : '41.95,53.45/4',
@@ -73,22 +74,32 @@ def get_driver(browser):
     return driver
 
 
-def shot(browser, area_name):
+def shot_pathname(area_name, shots_dir='.', use_area_subdirs=True):
+    """Set screenshot filename, create dirs and return path to it"""
+    now = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f'{area_name}_{now}.png'
+    if use_area_subdirs:  # use subdir for area
+        shots_dir = os.path.join(shots_dir, area_name)
+    os.makedirs(shots_dir, exist_ok=True)  # make dir if it doesn't exist
+    pathname = os.path.join(shots_dir, filename)
+    return pathname
+
+
+def shot(browser, area_name, shots_dir='.'):
     """Take screenshot of one area"""
     driver = get_driver(browser)
-    now = datetime.now().strftime("%Y%m%d_%H%M%S")
-    screenshot_name = f'{area_name}_{now}.png'
-    screenshot(driver, AREAS[area_name], screenshot_name)
+    screenshot_name = shot_pathname(area_name, shots_dir)
+    area = AREAS[area_name]
+    screenshot(driver, area, screenshot_name)
     print(f'Screenshot was taken: {screenshot_name}')
     driver.quit()
 
 
-def shot_all(browser, path_to_save='.'):
+def shot_all(browser, shots_dir='.'):
     """Take screenshots of all areas"""
     driver = get_driver(browser)
     for area_name, area in AREAS.items():
-        now = datetime.now().strftime("%Y%m%d_%H%M%S")
-        screenshot_name = f'{path_to_save}/{area_name}_{now}.png'
+        screenshot_name = shot_pathname(area_name, shots_dir)
         screenshot(driver, area, screenshot_name)
         print(f'Screenshot was taken: {screenshot_name}')
     driver.quit()
@@ -106,10 +117,10 @@ def loop():
 
 
 if __name__ == '__main__':
-    # if len(sys.argv) == 2:
-    #     path_to_save = sys.argv[1]
-    #     shot_all('firefox', path_to_save)
-    # else:
-    #     shot_all('firefox')
+    if len(sys.argv) == 2:
+        path_to_save = sys.argv[1]
+        shot_all('firefox', path_to_save)
+    else:
+        shot_all('firefox')
     
-    shot('firefox', 'russia')
+    # shot('firefox', 'russia')  # for test
