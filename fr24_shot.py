@@ -15,6 +15,7 @@ AREAS = {'eurasia'  : '41.95,53.45/4',
 
 
 def close_banners(driver):
+    """Closing banners on the website"""
     #close cookies banner
     cookies_banner_xpath = {'firefox': '/html/body/div[3]/div[4]/button',
                             'chrome': '//*[@id="map"]/div[3]/div[4]/button'}
@@ -30,6 +31,7 @@ def close_banners(driver):
 
 
 def screenshot(driver, area, screenshot_name='latest.png'):
+    """Take a screenshot of the area"""
     url = FR24_URL + area
     driver.get(url)
 
@@ -57,28 +59,33 @@ def get_driver_chrome():
     options.add_argument('headless')
     return webdriver.Chrome(chrome_options=options)
 
-
 def get_driver_firefox():
     options = webdriver.firefox.options.Options()
     options.headless = True
     return webdriver.Firefox(options=options)
       
+def get_driver(browser):
+    """Choose driver for browser, create it and return"""
+    get_driver_functions = {'firefox': get_driver_firefox,
+                            'chrome': get_driver_chrome}
+    get_driver_func = get_driver_functions[browser]
+    driver = get_driver_func()
+    return driver
+
 
 def shot(browser, area_name):
+    """Take screenshot of one area"""
+    driver = get_driver(browser)
     now = datetime.now().strftime("%Y%m%d_%H%M%S")
     screenshot_name = f'{area_name}_{now}.png'
-    get_driver = {'firefox': get_driver_firefox,
-                    'chrome': get_driver_chrome}
-    driver = get_driver[browser]()
     screenshot(driver, AREAS[area_name], screenshot_name)
     print(f'Screenshot was taken: {screenshot_name}')
     driver.quit()
 
 
 def shot_all(browser, path_to_save='.'):
-    get_driver = {'firefox': get_driver_firefox,
-                    'chrome': get_driver_chrome}
-    driver = get_driver[browser]()
+    """Take screenshots of all areas"""
+    driver = get_driver(browser)
     for area_name, area in AREAS.items():
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
         screenshot_name = f'{path_to_save}/{area_name}_{now}.png'
