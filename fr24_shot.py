@@ -3,16 +3,8 @@ import time
 from datetime import datetime
 import sys
 import os
+from config import FR24_URL, AREAS, RENDER_DELAY
 
-FR24_URL = 'https://www.flightradar24.com/'
-AREAS = {'eurasia'  : '41.95,53.45/4',
-        'europe'    : '48.77,18.64/5',
-        'russia'    : '56.85,42.64/6',
-        'russia2'   : '57.85,55.56/5',
-        'moscow'    : '55.77,37.54/9',
-        'usa'       : '38.28,-96.98/5',
-        'asia'      : '33.29,101.83/4',
-}
 
 
 def close_banners(driver):
@@ -51,7 +43,7 @@ def screenshot(driver, area, screenshot_name='latest.png'):
         except Exception as e:
             time.sleep(1)
             continue
-    time.sleep(5)  # wait for all elements to appear
+    time.sleep(RENDER_DELAY)  # wait for all elements to appear
     screenshot = driver.save_screenshot(screenshot_name)
 
 
