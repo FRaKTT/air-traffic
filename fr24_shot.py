@@ -4,6 +4,7 @@ from datetime import datetime
 import sys
 import os
 from config import FR24_URL, AREAS, RENDER_DELAY
+from image_processing import png2jpg
 
 
 
@@ -89,12 +90,18 @@ def shot(browser, area_name, shots_dir='.'):
 
 def shot_all(browser, shots_dir='.'):
     """Take screenshots of all areas"""
+    taken_shots = []
     driver = get_driver(browser)
     for area_name, area in AREAS.items():
         screenshot_name = shot_pathname(area_name, shots_dir)
         screenshot(driver, area, screenshot_name)
         print(f'Screenshot was taken: {screenshot_name}')
+        taken_shots.append(screenshot_name)
     driver.quit()
+    for shot_png in taken_shots:
+        shot_jpg = png2jpg(shot_png)
+        os.remove(shot_png)
+        print(f'{shot_png} converted to {shot_jpg}')
 
 
 def loop():
